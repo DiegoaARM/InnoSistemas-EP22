@@ -18,10 +18,6 @@ WORKDIR /app
 #Expose the JAR file form the builder stage
 COPY --from=builder /app/target/*.jar app.jar
 
-# Variables de entorno (se inyectan al ejecutar)
-ENV DB_PORT="5432"
-ENV DB="postgres"
-
 # Puerto expuesto
 EXPOSE 8080
 
