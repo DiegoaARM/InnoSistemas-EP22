@@ -14,4 +14,6 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Integer>
     // Obtener estudiante con cursos (carga eager personalizada)
     @Query("SELECT e FROM Estudiante e JOIN FETCH e.cursoList WHERE e.id = :id")
     Optional<Estudiante> findByIdWithCursos(@Param("id") Integer id);
+
+    Optional<Estudiante> findByEmail(String email);
 }

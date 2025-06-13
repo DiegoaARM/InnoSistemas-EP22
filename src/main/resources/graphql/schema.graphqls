@@ -53,7 +53,6 @@ type Mutation {
     #estudiante
     crearEstudiante(estudiante: EstudianteInput!): Estudiante
     actualizarEstudiante(estudiante: EstudianteInput!): Estudiante
-    eliminarEstudiante(id: ID!): Boolean
 
     #integracion
     crearIntegracion(estudianteId: ID!, equipoId: ID!, rolId: ID!): Integracion
@@ -63,4 +62,15 @@ type Mutation {
     crearNotificacion(tipo: String!, estudianteId: ID!, equipoId: ID!): Notificacion
     marcarNotificacionComoLeida(id: ID!): Notificacion
     eliminarNotificacion(id: ID!): Boolean
+
+    login(input: AuthRequest!): AuthResponse
+}
+
+type AuthResponse {
+    token: String
+}
+
+input AuthRequest {
+    email: String!
+    password: String!
 }
