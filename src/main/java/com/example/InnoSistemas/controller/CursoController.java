@@ -6,6 +6,7 @@ import com.example.InnoSistemas.service.CursoService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -19,16 +20,19 @@ public class CursoController {
         this.cursoService = cursoService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<Curso> cursos() {
         return cursoService.findAll();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public Curso curso(@Argument int id) {
         return cursoService.findById(id);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Curso crearCurso(@Argument Curso curso) {
         // Crear nuevo curso con solo los campos básicos
@@ -50,6 +54,7 @@ public class CursoController {
         return cursoService.findById(cursoGuardado.getId());
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Curso actualizarCurso(@Argument int id, @Argument Curso input) {
         Curso curso = new Curso();
@@ -58,23 +63,27 @@ public class CursoController {
         return cursoService.update(id, curso);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Boolean eliminarCurso(@Argument int id) {
         cursoService.deleteById(id);
         return true;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<Estudiante> estudiantesPorCurso(@Argument int id) {
         return cursoService.getEstudiantesByCursoId(id);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Boolean agregarEstudianteACurso(@Argument int cursoId, @Argument int estudianteId) {
         cursoService.addEstudianteToCurso(cursoId, estudianteId);
         return true;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Boolean eliminarEstudianteDeCurso(@Argument int cursoId, @Argument int estudianteId) {
         cursoService.deleteEstudianteFromCurso(cursoId, estudianteId);

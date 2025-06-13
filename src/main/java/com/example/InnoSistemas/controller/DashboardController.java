@@ -5,6 +5,7 @@ import com.example.InnoSistemas.service.DashboardService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -18,21 +19,25 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<Dashboard> dashboards() {
         return dashboardService.findAll();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public Dashboard dashboard(@Argument int id) {
         return dashboardService.findById(id);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<Dashboard> dashboardsPorEquipo(@Argument int equipoId) {
         return dashboardService.findByEquipoId(equipoId);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Dashboard crearDashboard(@Argument Dashboard dashboardInput, @Argument int equipoId) {
         Dashboard dashboard = new Dashboard();
@@ -42,6 +47,7 @@ public class DashboardController {
         return dashboardService.save(dashboard, equipoId);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Dashboard actualizarDashboard(@Argument int id, @Argument Dashboard dashboardInput) {
         Dashboard dashboard = new Dashboard();
@@ -51,6 +57,7 @@ public class DashboardController {
         return dashboardService.update(id, dashboard);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Boolean eliminarDashboard(@Argument int id) {
         dashboardService.delete(id);

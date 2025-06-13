@@ -5,6 +5,7 @@ import com.example.InnoSistemas.service.IntegracionService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -18,31 +19,37 @@ public class IntegracionController {
         this.integracionService = integracionService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<Integracion> integraciones() {
         return integracionService.findAll();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public Integracion integracion(@Argument int id) {
         return integracionService.findById(id);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<Integracion> integracionesPorEstudiante(@Argument int estudianteId) {
         return integracionService.findByEstudianteId(estudianteId);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<Integracion> integracionesPorEquipo(@Argument int equipoId) {
         return integracionService.findByEquipoId(equipoId);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Integracion crearIntegracion(@Argument int estudianteId, @Argument int equipoId, @Argument int rolId) {
         return integracionService.save(estudianteId, equipoId, rolId);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Boolean eliminarIntegracion(@Argument int id, @Argument int currentlyEstudianteId) {
         // Buscar la integración a eliminar

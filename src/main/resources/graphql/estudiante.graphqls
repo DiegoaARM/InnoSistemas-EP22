@@ -1,13 +1,13 @@
-type Estudiante {
-    id: ID!
-    nombre: String
-    apellidos: String
-    email: String
+input EstudianteInput {
+    nombre: String!
+    apellidos: String!
+    email: String!
+    password: String!
 }
 
-input EstudianteInput {
-    id: ID
-    nombre: String
-    apellidos: String
-    email: String
+type Estudiante {
+    id: ID!
+    nombre: String!
+    apellidos: String!
+    email: String!
 }

@@ -62,15 +62,4 @@ type Mutation {
     crearNotificacion(tipo: String!, estudianteId: ID!, equipoId: ID!): Notificacion
     marcarNotificacionComoLeida(id: ID!): Notificacion
     eliminarNotificacion(id: ID!): Boolean
-
-    login(input: AuthRequest!): AuthResponse
-}
-
-type AuthResponse {
-    token: String
-}
-
-input AuthRequest {
-    email: String!
-    password: String!
 }
