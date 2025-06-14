@@ -27,8 +27,9 @@ public class Notificacion {
     @JoinColumn(name = "equipo_id")
     private Equipo equipo;
 
-    @Column(name = "tipo")
-    private String tipo;
+    @ManyToOne
+    @JoinColumn(name = "plantilla_id")
+    private PlantillaNotificacion plantilla;
 
     @Column(name = "fecha_envio")
     private LocalDateTime fecha_envio;

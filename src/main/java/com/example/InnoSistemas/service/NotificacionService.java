@@ -3,6 +3,7 @@ package com.example.InnoSistemas.service;
 import com.example.InnoSistemas.entity.Equipo;
 import com.example.InnoSistemas.entity.Estudiante;
 import com.example.InnoSistemas.entity.Notificacion;
+import com.example.InnoSistemas.entity.PlantillaNotificacion;
 import com.example.InnoSistemas.repository.EquipoRepository;
 import com.example.InnoSistemas.repository.EstudianteRepository;
 import com.example.InnoSistemas.repository.NotificacionRepository;
@@ -12,20 +13,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @Service
-@Transactional
 public class NotificacionService {
 
-    @Autowired
-    private NotificacionRepository notificacionRepository;
-
-    @Autowired
-    private EstudianteRepository estudianteRepository;
-
-    @Autowired
-    private EquipoRepository equipoRepository;
+    private final EmailService emailService;
+    private final PlantillaNotificacionService plantillaService;
+    private final EstudianteRepository estudianteRepository;
+    private final EquipoRepository equipoRepository;
+    private final NotificacionRepository notificacionRepository;
 
     public List<Notificacion> findAll() {
         return notificacionRepository.findAll();
@@ -36,18 +35,44 @@ public class NotificacionService {
                 .orElseThrow(() -> new EntityNotFoundException("Notificación no encontrada"));
     }
 
-    public Notificacion create(String tipo, Integer estudianteId, Integer equipoId) {
+    public NotificacionService(EmailService emailService, PlantillaNotificacionService plantillaService,
+                               EstudianteRepository estudianteRepository, EquipoRepository equipoRepository,
+                               NotificacionRepository notificacionRepository) {
+        this.emailService = emailService;
+        this.plantillaService = plantillaService;
+        this.estudianteRepository = estudianteRepository;
+        this.equipoRepository = equipoRepository;
+        this.notificacionRepository = notificacionRepository;
+    }
+
+    public Notificacion createFromTemplate(String tipo, Integer estudianteId, Integer equipoId, Map<String, Object> variables) {
+        // 1. Obtener estudiante y equipo
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new EntityNotFoundException("Estudiante no encontrado"));
         Equipo equipo = equipoRepository.findById(equipoId)
                 .orElseThrow(() -> new EntityNotFoundException("Equipo no encontrado"));
 
+        // 2. Crear notificación en base de datos
         Notificacion notificacion = new Notificacion();
-        notificacion.setTipo(tipo);
+        PlantillaNotificacion plantilla = plantillaService.findByTipo(tipo);
+        notificacion.setPlantilla(plantilla);
         notificacion.setEstudiante(estudiante);
         notificacion.setEquipo(equipo);
         notificacion.setFecha_envio(LocalDateTime.now());
         notificacion.setLeida(false);
+
+        // 3. Enviar email
+        try {
+            // Añadir variables comunes
+            variables.put("nombreEstudiante", estudiante.getNombre());
+            variables.put("nombreEquipo", equipo.getNombre());
+            variables.put("fecha", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+
+            emailService.sendNotificationEmail(estudiante.getEmail(), tipo, variables);
+        } catch (Exception e) {
+            // Registrar error pero continuar
+            System.err.println("Error enviando email: " + e.getMessage());
+        }
 
         return notificacionRepository.save(notificacion);
     }

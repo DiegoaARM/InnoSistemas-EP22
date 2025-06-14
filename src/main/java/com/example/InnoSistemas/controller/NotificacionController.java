@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class NotificacionController {
@@ -45,8 +46,12 @@ public class NotificacionController {
 
     @PreAuthorize("isAuthenticated()")
     @MutationMapping
-    public Notificacion crearNotificacion(@Argument String tipo, @Argument int estudianteId, @Argument int equipoId) {
-        return notificacionService.create(tipo, estudianteId, equipoId);
+    public Notificacion crearNotificacion(
+            @Argument String tipo,
+            @Argument int estudianteId,
+            @Argument int equipoId,
+            @Argument Map<String, Object> variables) {
+        return notificacionService.createFromTemplate(tipo, estudianteId, equipoId, variables);
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -59,7 +59,17 @@ type Mutation {
     eliminarIntegracion(id: ID!): Boolean
 
     #notificacion
-    crearNotificacion(tipo: String!, estudianteId: ID!, equipoId: ID!): Notificacion
+    crearNotificacion(
+        tipo: String!
+        estudianteId: ID!
+        equipoId: ID!
+        variables: [VariableInput!]
+    ): Notificacion
     marcarNotificacionComoLeida(id: ID!): Notificacion
     eliminarNotificacion(id: ID!): Boolean
+}
+
+input VariableInput {
+    key: String!
+    value: String!
 }

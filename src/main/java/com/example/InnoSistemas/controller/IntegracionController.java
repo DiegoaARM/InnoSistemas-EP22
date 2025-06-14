@@ -1,22 +1,34 @@
 package com.example.InnoSistemas.controller;
 
+import com.example.InnoSistemas.entity.Estudiante;
 import com.example.InnoSistemas.entity.Integracion;
+import com.example.InnoSistemas.service.EstudianteService;
 import com.example.InnoSistemas.service.IntegracionService;
+import com.example.InnoSistemas.service.NotificacionService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class IntegracionController {
 
     private final IntegracionService integracionService;
 
-    public IntegracionController(IntegracionService integracionService) {
+    private final NotificacionService notificacionService;
+
+    private final EstudianteService estudianteService;
+
+    public IntegracionController(IntegracionService integracionService, NotificacionService notificacionService, EstudianteService estudianteService) {
         this.integracionService = integracionService;
+        this.notificacionService = notificacionService;
+        this.estudianteService = estudianteService;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -43,34 +55,43 @@ public class IntegracionController {
         return integracionService.findByEquipoId(equipoId);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Integracion crearIntegracion(@Argument int estudianteId, @Argument int equipoId, @Argument int rolId) {
-        return integracionService.save(estudianteId, equipoId, rolId);
+        Integracion integracion = integracionService.save(estudianteId, equipoId, rolId);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("rol", integracion.getRol().getNombre());
+        variables.put("equipo", integracion.getEquipo().getNombre());
+
+        notificacionService.createFromTemplate(
+                "Asignación a equipo",
+                estudianteId,
+                equipoId,
+                variables
+        );
+
+        return integracion;
     }
 
-    @PreAuthorize("isAuthenticated()")
     @MutationMapping
-    public Boolean eliminarIntegracion(@Argument int id, @Argument int currentlyEstudianteId) {
-        // Buscar la integración a eliminar
+    public Boolean eliminarIntegracion(@Argument int id, @Argument String razon) {
         Integracion integracion = integracionService.findById(id);
-        if (integracion == null) {
-            throw new RuntimeException("La integración no existe.");
-        }
-        // Obtener el equipo al que pertenece esta integración
-        int equipoId = integracion.getEquipo().getId();
-        // Buscar si el estudiante actual tiene rol de administrador en este equipo
-        List<Integracion> integracionesDelEquipo = integracionService.findByEquipoId(equipoId);
 
-        boolean esAdmin = integracionesDelEquipo.stream()
-                .anyMatch(i -> i.getEstudiante().getId() == currentlyEstudianteId
-                        && i.getRol().getId() == 1);
-        if (!esAdmin) {
-            throw new RuntimeException("No tienes permisos para eliminar esta integración.");
-        }
-        // Si es administrador, proceder a eliminar
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("razon", razon);
+        variables.put("equipo", integracion.getEquipo().getNombre());
+
+        notificacionService.createFromTemplate(
+                "Expulsión del equipo",
+                integracion.getEstudiante().getId(),
+                integracion.getEquipo().getId(),
+                variables
+        );
+
         integracionService.delete(id);
         return true;
     }
+
+
 
 }
