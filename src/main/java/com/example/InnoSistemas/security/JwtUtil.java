@@ -2,6 +2,7 @@ package com.example.InnoSistemas.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -15,13 +16,17 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private final SecretKey secretKey;
+    @Value("${jwt.secret}")
+    private String secret;
 
     @Value("${jwt.expiration}")
     private int expiration;
 
-    public JwtUtil() {
-        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Genera clave segura automática
+    private SecretKey secretKey;
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String extractUsername(String token) {
@@ -52,7 +57,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 horas
-                .signWith(  secretKey)
+                .signWith(secretKey)
                 .compact();
     }
 

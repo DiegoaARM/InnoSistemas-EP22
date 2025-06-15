@@ -52,18 +52,17 @@ type Mutation {
 
     #estudiante
     crearEstudiante(estudiante: EstudianteInput!): Estudiante
-    actualizarEstudiante(estudiante: EstudianteInput!): Estudiante
+    actualizarEstudiante(input: EstudianteInput!, id: ID!): Estudiante
 
     #integracion
     crearIntegracion(estudianteId: ID!, equipoId: ID!, rolId: ID!): Integracion
-    eliminarIntegracion(id: ID!): Boolean
+    eliminarIntegracion(id: ID!, razon: String!): Boolean
 
     #notificacion
     crearNotificacion(
         tipo: String!
         estudianteId: ID!
         equipoId: ID!
-        variables: [VariableInput!]
     ): Notificacion
     marcarNotificacionComoLeida(id: ID!): Notificacion
     eliminarNotificacion(id: ID!): Boolean

@@ -26,14 +26,7 @@ public class NotificacionService {
     private final EquipoRepository equipoRepository;
     private final NotificacionRepository notificacionRepository;
 
-    public List<Notificacion> findAll() {
-        return notificacionRepository.findAll();
-    }
 
-    public Notificacion findById(Integer id) {
-        return notificacionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Notificación no encontrada"));
-    }
 
     public NotificacionService(EmailService emailService, PlantillaNotificacionService plantillaService,
                                EstudianteRepository estudianteRepository, EquipoRepository equipoRepository,
@@ -45,7 +38,16 @@ public class NotificacionService {
         this.notificacionRepository = notificacionRepository;
     }
 
-    public Notificacion createFromTemplate(String tipo, Integer estudianteId, Integer equipoId, Map<String, Object> variables) {
+    public List<Notificacion> findAll() {
+        return notificacionRepository.findAll();
+    }
+
+    public Notificacion findById(Integer id) {
+        return notificacionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Notificación no encontrada"));
+    }
+
+    public Notificacion createFromTemplate(String tipo, Integer estudianteId, Integer equipoId) {
         // 1. Obtener estudiante y equipo
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new EntityNotFoundException("Estudiante no encontrado"));
@@ -61,18 +63,8 @@ public class NotificacionService {
         notificacion.setFecha_envio(LocalDateTime.now());
         notificacion.setLeida(false);
 
-        // 3. Enviar email
-        try {
-            // Añadir variables comunes
-            variables.put("nombreEstudiante", estudiante.getNombre());
-            variables.put("nombreEquipo", equipo.getNombre());
-            variables.put("fecha", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-
-            emailService.sendNotificationEmail(estudiante.getEmail(), tipo, variables);
-        } catch (Exception e) {
-            // Registrar error pero continuar
-            System.err.println("Error enviando email: " + e.getMessage());
-        }
+        System.out.println(estudiante.getEmail());
+        emailService.sendEmail(estudiante.getEmail(), plantilla.getTipo(), plantilla.getMensajeBase());
 
         return notificacionRepository.save(notificacion);
     }

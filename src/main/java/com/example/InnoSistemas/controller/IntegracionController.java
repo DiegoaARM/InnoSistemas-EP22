@@ -55,19 +55,15 @@ public class IntegracionController {
         return integracionService.findByEquipoId(equipoId);
     }
 
+    @PreAuthorize("permitAll()")
     @MutationMapping
     public Integracion crearIntegracion(@Argument int estudianteId, @Argument int equipoId, @Argument int rolId) {
         Integracion integracion = integracionService.save(estudianteId, equipoId, rolId);
 
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("rol", integracion.getRol().getNombre());
-        variables.put("equipo", integracion.getEquipo().getNombre());
-
         notificacionService.createFromTemplate(
                 "Asignación a equipo",
                 estudianteId,
-                equipoId,
-                variables
+                equipoId
         );
 
         return integracion;
@@ -84,8 +80,7 @@ public class IntegracionController {
         notificacionService.createFromTemplate(
                 "Expulsión del equipo",
                 integracion.getEstudiante().getId(),
-                integracion.getEquipo().getId(),
-                variables
+                integracion.getEquipo().getId()
         );
 
         integracionService.delete(id);

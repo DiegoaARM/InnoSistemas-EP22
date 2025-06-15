@@ -49,9 +49,8 @@ public class NotificacionController {
     public Notificacion crearNotificacion(
             @Argument String tipo,
             @Argument int estudianteId,
-            @Argument int equipoId,
-            @Argument Map<String, Object> variables) {
-        return notificacionService.createFromTemplate(tipo, estudianteId, equipoId, variables);
+            @Argument int equipoId) {
+        return notificacionService.createFromTemplate(tipo, estudianteId, equipoId);
     }
 
     @PreAuthorize("isAuthenticated()")
