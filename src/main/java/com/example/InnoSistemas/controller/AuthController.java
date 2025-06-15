@@ -6,6 +6,7 @@ import com.example.InnoSistemas.service.EstudianteDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,15 +24,25 @@ public class AuthController {
     @Autowired
     private EstudianteDetailsService userDetailsService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        // 1. Autenticar usuario (verifica email/password)
+        // Buscar el usuario
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
-        // 2. Generar token
+        // Validar la contraseña
+        if (!passwordEncoder.matches(request.getPassword(), userDetails.getPassword())) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "message", "Credenciales inválidas",
+                    "success", false
+            ));
+        }
+
+        // Generar token si la contraseña es válida
         String jwt = jwtUtil.generateToken(request.getEmail());
 
-        // 3. Devolver respuesta
         return ResponseEntity.ok(Map.of(
                 "jwt", jwt,
                 "message", "Login exitoso",
