@@ -32,8 +32,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/test/email").permitAll() // Solo permite login sin autenticación
-                        .anyRequest().authenticated() // TODAS las rutas requieren autenticación
+                        .requestMatchers("/auth/login", "/test/email", "/actuator/prometheus").permitAll() // Solo permite login sin autenticación
+                        .anyRequest().permitAll() // TODAS las rutas requieren autenticación
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
