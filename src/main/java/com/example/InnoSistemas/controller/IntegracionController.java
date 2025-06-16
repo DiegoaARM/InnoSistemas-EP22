@@ -60,11 +60,11 @@ public class IntegracionController {
     public Integracion crearIntegracion(@Argument int estudianteId, @Argument int equipoId, @Argument int rolId) {
         Integracion integracion = integracionService.save(estudianteId, equipoId, rolId);
 
-        notificacionService.createFromTemplate(
-                "Asignación a equipo",
-                estudianteId,
-                equipoId
-        );
+//        notificacionService.createFromTemplate(
+//                "Asignación a equipo",
+//                estudianteId,
+//                equipoId
+//        );
 
         return integracion;
     }
@@ -73,15 +73,11 @@ public class IntegracionController {
     public Boolean eliminarIntegracion(@Argument int id, @Argument String razon) {
         Integracion integracion = integracionService.findById(id);
 
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("razon", razon);
-        variables.put("equipo", integracion.getEquipo().getNombre());
-
-        notificacionService.createFromTemplate(
-                "Expulsión del equipo",
-                integracion.getEstudiante().getId(),
-                integracion.getEquipo().getId()
-        );
+//        notificacionService.createFromTemplate(
+//                "Expulsión del equipo",
+//                integracion.getEstudiante().getId(),
+//                integracion.getEquipo().getId()
+//        );
 
         integracionService.delete(id);
         return true;

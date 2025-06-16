@@ -64,8 +64,7 @@ public class NotificacionService {
         notificacion.setLeida(false);
 
         System.out.println(estudiante.getEmail());
-        emailService.sendEmail(estudiante.getEmail(), plantilla.getTipo(), plantilla.getMensajeBase());
-
+        //emailService.sendEmail(estudiante.getEmail(), plantilla.getTipo(), plantilla.getMensajeBase());
         return notificacionRepository.save(notificacion);
     }
 

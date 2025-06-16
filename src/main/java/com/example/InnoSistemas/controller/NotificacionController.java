@@ -47,10 +47,10 @@ public class NotificacionController {
     @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public Notificacion crearNotificacion(
-            @Argument String tipo,
+            @Argument String plantilla,
             @Argument int estudianteId,
             @Argument int equipoId) {
-        return notificacionService.createFromTemplate(tipo, estudianteId, equipoId);
+        return notificacionService.createFromTemplate(plantilla, estudianteId, equipoId);
     }
 
     @PreAuthorize("isAuthenticated()")

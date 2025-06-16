@@ -1,8 +1,14 @@
 type Notificacion {
     id: ID!
-    tipo: String
+    plantilla: Plantilla
     estudiante: Estudiante
     equipo: Equipo
     fecha_envio: String
     leida: Boolean
+}
+
+type Plantilla {
+    id: ID!
+    tipo: String
+    mensaje_base: String
 }
